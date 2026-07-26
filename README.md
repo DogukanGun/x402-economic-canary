@@ -4,12 +4,12 @@
 their minimum advertised price, verifies what actually comes back, and tells you
 whether your next routed call will get anything for its money.
 
-> **Casper Agentic Buildathon 2026 — Final Round submission.**
+> **Casper Agentic Buildathon 2026 Final Round submission.**
 > Live demo: [casper-pay-guard.vercel.app](https://casper-pay-guard.vercel.app) ·
 > Demo video: _(link pending)_ ·
 > Real settlement on Casper Testnet:
-> [`687c0f2e…`](https://testnet.cspr.live/deploy/687c0f2ecfb9fc9e191779449b4945f8ac46533e5e832b0167533a574daba2ab)
-> — see [Casper Testnet settlement](#casper-testnet-settlement).
+> [`687c0f2e...`](https://testnet.cspr.live/deploy/687c0f2ecfb9fc9e191779449b4945f8ac46533e5e832b0167533a574daba2ab)
+> (see [Casper Testnet settlement](#casper-testnet-settlement)).
 
 x402 is trustless at the payment layer and trust-maximal at the delivery layer.
 There is no escrow, no conditional release, and nothing in the protocol that
@@ -20,7 +20,7 @@ looks perfect.
 
 Every incumbent trust signal is blind to this:
 
-- **Uptime monitors** see the 402 handshake and score the endpoint healthy — at
+- **Uptime monitors** see the 402 handshake and score the endpoint healthy at
   the exact moment it is taking money and stalling.
 - **Marketplace ratings** derive trust from settlement volume, which a stalling
   endpoint *accumulates*. The metric meant to build trust is the one the attacker
@@ -29,7 +29,7 @@ Every incumbent trust signal is blind to this:
   check whether the artifact exists.
 
 None of them ever observes post-settlement delivery. The only signal a provider
-cannot spoof is one obtained under the economics of a real call — so this canary
+cannot spoof is one obtained under the economics of a real call, so this canary
 pays like a customer and checks like a skeptic.
 
 ```
@@ -64,7 +64,7 @@ latency     1015.2 ms
 gap         1001.6 ms
 schema ok   False
 paid        0.001 USDC  tx 0x8f2c1ab34de90f12…
-WASTED      0.001 USDC — settled, nothing usable back
+WASTED      0.001 USDC (settled, nothing usable back)
 ```
 
 The same endpoint answers an unauthenticated liveness check with a perfectly
@@ -120,7 +120,7 @@ Seven layers, following the paper's Figure 1:
 starts. Settlement consumes the authorization; it does not wait on the origin.
 If you start the clock when the origin's headers arrive, a provider that takes
 your money and then withholds its status line reports a near-zero gap and grades
-as healthy — the exact endpoint that is robbing you looks fastest. The gap is
+as healthy, and the exact endpoint that is robbing you looks fastest. The gap is
 measured from settlement (`x402/handshake.py`), which is why `stalled_silent`
 grades correctly.
 
@@ -143,7 +143,7 @@ printed-vs-computed comparison.
 The paper's Methods section describes a different experiment from the one that
 produced its results, three of its reported tables had no generating code, and
 the sign of its economic claim depends on a routing-policy choice the text and
-the code disagree about. All of it is implemented, measured, and written down —
+the code disagree about. All of it is implemented, measured, and written down,
 including the two acceptance targets the honest forecast-mode configuration
 misses.
 
@@ -180,7 +180,7 @@ network `casper:casper-test`) is the stated next step on live rails; the
 
 - **No mainnet money has moved.** Every published number is simulated or comes
   from the local mock ASP. The only real transactions this project produces are
-  the Casper Testnet settlement demos described above — test CSPR, no real value.
+  the Casper Testnet settlement demos described above, which move test CSPR with no real value.
 - **Signing is real, settlement is stubbed.** Signatures are genuine EIP-712 and
   recover to the payer address. The default facilitator mints deterministic
   receipts against a SQLite ledger and never touches a chain.
@@ -191,14 +191,14 @@ network `casper:casper-test`) is the stated next step on live rails; the
   nothing here tests that path. Taking the canary onto live rails is the paper's
   stated next step, not a claimed result.
 - **Key handling.** The payer key comes from `$CANARY_PRIVATE_KEY`, or is
-  generated ephemerally in memory. It is never written to disk and never logged —
+  generated ephemerally in memory. It is never written to disk and never logged;
   only the derived address is. Fund that address with dust and nothing more.
 
 ## Layout
 
 ```
 src/casper_pay_guard/
-├── repro/          FROZEN — reproduces the published numbers, do not refactor
+├── repro/          FROZEN: reproduces the published numbers, do not refactor
 ├── x402/           types, signer, facilitator, handshake
 ├── metrics/        bootstrap CIs, off-policy estimators
 ├── oracle.py       four-way delivery classifier
