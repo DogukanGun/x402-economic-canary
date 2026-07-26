@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casper Pay Guard — an economic canary for pay-then-deliver x402 markets</title>
+<meta name="description" content="It pays x402 endpoints like a customer, verifies the artifact, and tells you whether your next routed call will get anything for its money.">
+<style>
+  :root {
+    --bg: #0b1114;
+    --bg-raise: #101a1e;
+    --panel: #131f24;
+    --panel-2: #17262c;
+    --line: #22343b;
+    --line-soft: #1b2b32;
+    --text: #dce8ea;
+    --text-dim: #8fa6ab;
+    --teal: #2a9d8f;
+    --teal-bright: #3fc4b3;
+    --teal-dim: rgba(42, 157, 143, 0.14);
+    --amber: #e9c46a;
+    --amber-dim: rgba(233, 196, 106, 0.13);
+    --red: #e76f51;
+    --red-bright: #f08a70;
+    --red-dim: rgba(231, 111, 81, 0.13);
+    --green: #57c785;
+    --green-dim: rgba(87, 199, 133, 0.12);
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--teal-bright); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 88px 0; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 14px;
+  }
+  h2 { font-size: clamp(26px, 3.4vw, 36px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .section-lede { color: var(--text-dim); max-width: 720px; margin-bottom: 44px; font-size: 17px; }
+  code, .mono { font-family: var(--mono); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    padding: 110px 0 90px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line-soft);
+    background:
+      radial-gradient(1100px 480px at 78% -10%, rgba(42,157,143,0.13), transparent 62%),
+      radial-gradient(700px 420px at 8% 110%, rgba(231,111,81,0.06), transparent 60%),
+      var(--bg);
+  }
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(42,157,143,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(42,157,143,0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(720px 420px at 60% 0%, #000 25%, transparent 78%);
+    -webkit-mask-image: radial-gradient(720px 420px at 60% 0%, #000 25%, transparent 78%);
+    pointer-events: none;
+  }
+  .hero .wrap { position: relative; }
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+  .badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--bg-raise);
+    color: var(--text-dim);
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px rgba(42,157,143,0.8); }
+  h1 {
+    font-size: clamp(34px, 5.4vw, 60px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    margin-bottom: 22px;
+  }
+  h1 .proj { font-family: var(--mono); color: var(--teal-bright); font-weight: 700; }
+  .hero-sub {
+    font-size: clamp(17px, 2vw, 21px);
+    color: var(--text-dim);
+    max-width: 780px;
+    margin-bottom: 18px;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+  .hero-hook {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--red-bright);
+    background: var(--red-dim);
+    border: 1px solid rgba(231,111,81,0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    max-width: 780px;
+    margin-bottom: 34px;
+  }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 14px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 13px 26px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); }
+  .btn-primary { background: var(--teal); color: #06211d; box-shadow: 0 6px 24px rgba(42,157,143,0.28); }
+  .btn-primary:hover { background: var(--teal-bright); }
+  .btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn-ghost:hover { border-color: var(--teal); background: var(--teal-dim); }
+
+  /* ---------- demo panel ---------- */
+  .demo { border-bottom: 1px solid var(--line-soft); background: var(--bg-raise); }
+  .demo-controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+    margin-bottom: 30px;
+  }
+  .counter {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 18px;
+    min-width: 168px;
+  }
+  .counter .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+  .counter .value { font-family: var(--mono); font-size: 22px; font-weight: 700; margin-top: 2px; }
+  .counter.spent .value { color: var(--teal-bright); }
+  .counter.wasted { border-color: rgba(231,111,81,0.4); }
+  .counter.wasted .label { color: var(--red-bright); }
+  .counter.wasted .value { color: var(--red-bright); }
+  .counter.wasted.flash { animation: wasteflash 0.6s ease; }
+  @keyframes wasteflash {
+    0% { background: rgba(231,111,81,0.35); }
+    100% { background: var(--panel); }
+  }
+
+  .provider-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 16px;
+    margin-bottom: 34px;
+  }
+  .pcard {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .pcard.probing { border-color: var(--teal); box-shadow: 0 0 0 1px var(--teal), 0 8px 28px rgba(42,157,143,0.18); }
+  .pcard.done-stalled { border-color: rgba(231,111,81,0.55); }
+  .pcard.done-degraded { border-color: rgba(233,196,106,0.5); }
+  .pcard-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+  .pcard-name { font-family: var(--mono); font-size: 14.5px; font-weight: 700; color: var(--text); }
+  .pcard-price { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
+  .pcard-path { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); margin-bottom: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .villain-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    border: 1px dashed rgba(231,111,81,0.55);
+    border-radius: 5px;
+    padding: 1px 7px;
+    margin-bottom: 10px;
+  }
+  .verdict-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .verdict-box {
+    border-radius: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--line-soft);
+    background: var(--panel-2);
+    min-height: 58px;
+  }
+  .verdict-box .src { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+  }
+  .chip .cdot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .chip-healthy { background: var(--green-dim); color: var(--green); }
+  .chip-healthy .cdot { background: var(--green); }
+  .chip-idle { background: rgba(143,166,171,0.1); color: var(--text-dim); }
+  .chip-idle .cdot { background: var(--text-dim); }
+  .chip-delivered { background: var(--green-dim); color: var(--green); }
+  .chip-delivered .cdot { background: var(--green); }
+  .chip-degraded { background: var(--amber-dim); color: var(--amber); }
+  .chip-degraded .cdot { background: var(--amber); }
+  .chip-stalled { background: var(--red-dim); color: var(--red-bright); }
+  .chip-stalled .cdot { background: var(--red); box-shadow: 0 0 7px rgba(231,111,81,0.8); }
+  .verdict-meta { font-family: var(--mono); font-size: 10.5px; color: var(--text-dim); margin-top: 5px; min-height: 14px; }
+  .verdict-meta .bad { color: var(--red-bright); }
+  .spinner {
+    width: 12px; height: 12px; flex: none;
+    border: 2px solid rgba(42,157,143,0.25);
+    border-top-color: var(--teal-bright);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: -2px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .chip-probing { background: var(--teal-dim); color: var(--teal-bright); }
+
+  .log-panel {
+    background: #0a1013;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .log-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .log-head .title { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+  .log-head .gap-note { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+  .log-scroll { overflow-x: auto; }
+  table.log { border-collapse: collapse; width: 100%; min-width: 780px; }
+  table.log th, table.log td {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: left;
+    padding: 8px 14px;
+    white-space: nowrap;
+  }
+  table.log th {
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  table.log td { border-bottom: 1px solid rgba(34,52,59,0.45); color: var(--text-dim); }
+  table.log td.v-delivered { color: var(--green); font-weight: 700; }
+  table.log td.v-degraded { color: var(--amber); font-weight: 700; }
+  table.log td.v-stalled { color: var(--red-bright); font-weight: 700; }
+  table.log td.ep { color: var(--text); }
+  table.log td.tx { color: #6d858c; }
+  table.log tr.new-row { animation: rowin 0.4s ease; }
+  @keyframes rowin { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .log-empty { padding: 22px 18px; font-family: var(--mono); font-size: 12.5px; color: var(--text-dim); }
+
+  /* ---------- numbers ---------- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin-bottom: 26px;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 22px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--teal), transparent 70%);
+    opacity: 0.7;
+  }
+  .stat .num { font-family: var(--mono); font-size: clamp(28px, 3vw, 36px); font-weight: 700; color: var(--teal-bright); letter-spacing: -0.02em; }
+  .stat .num small { font-size: 0.5em; color: var(--text-dim); font-weight: 600; }
+  .stat .name { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 6px; }
+  .stat .sub { font-size: 12.5px; color: var(--text-dim); margin-top: 3px; }
+  .fine-print {
+    border-left: 3px solid var(--amber);
+    background: var(--amber-dim);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    max-width: 880px;
+  }
+  .fine-print strong { color: var(--amber); }
+
+  /* ---------- receipt ---------- */
+  .chain { border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); background: var(--bg-raise); }
+  .chain-flex { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+  .chain-copy { flex: 1 1 340px; }
+  .chain-copy p { color: var(--text-dim); margin-bottom: 14px; max-width: 520px; }
+  .receipt {
+    flex: 1 1 400px;
+    max-width: 560px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+  }
+  .receipt-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 15px 22px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .receipt-top .rt { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+  .receipt-top .settled {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    color: var(--green); background: var(--green-dim);
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .receipt-body { padding: 10px 22px 20px; }
+  .rrow {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line-soft);
+  }
+  .rrow:last-child { border-bottom: none; }
+  .rrow .k { font-size: 13px; color: var(--text-dim); flex: none; }
+  .rrow .v { font-family: var(--mono); font-size: 13px; color: var(--text); text-align: right; overflow-wrap: anywhere; }
+  .rrow .v.hash { color: var(--teal-bright); }
+  .receipt-foot { padding: 14px 22px; border-top: 1px solid var(--line-soft); }
+  .receipt-foot a { font-family: var(--mono); font-size: 13px; }
+
+  /* ---------- how it works ---------- */
+  .tax-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+  .tax {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .tax .chip { margin-bottom: 10px; }
+  .chip-unreachable { background: rgba(143,166,171,0.12); color: var(--text-dim); }
+  .chip-unreachable .cdot { background: var(--text-dim); }
+  .tax p { font-size: 13.5px; color: var(--text-dim); }
+  .tax p strong { color: var(--text); }
+
+  .pipeline {
+    display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .pl-step {
+    flex: 1 1 118px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 12px;
+    position: relative;
+    min-width: 118px;
+  }
+  .pl-step .n { font-family: var(--mono); font-size: 10px; color: var(--teal); letter-spacing: 0.12em; }
+  .pl-step .t { font-family: var(--mono); font-size: 13.5px; font-weight: 700; color: var(--text); margin: 2px 0 3px; }
+  .pl-step .d { font-size: 11.5px; color: var(--text-dim); line-height: 1.45; }
+  .pl-arrow { align-self: center; color: var(--teal); font-family: var(--mono); font-size: 15px; flex: none; padding: 0 1px; }
+  .pipeline-note { font-size: 13.5px; color: var(--text-dim); max-width: 860px; margin-bottom: 40px; }
+  .pipeline-note strong { color: var(--text); }
+
+  .mcp-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .mcp-tool {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .mcp-tool .tn { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--teal-bright); margin-bottom: 6px; }
+  .mcp-tool p { font-size: 13px; color: var(--text-dim); }
+
+  /* ---------- footer ---------- */
+  footer {
+    border-top: 1px solid var(--line-soft);
+    padding: 44px 0 56px;
+    background: var(--bg-raise);
+  }
+  .foot-flex { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 22px; align-items: baseline; }
+  .foot-brand { font-family: var(--mono); font-weight: 700; color: var(--text); }
+  .foot-brand span { color: var(--teal); }
+  .foot-note { font-size: 13px; color: var(--text-dim); max-width: 620px; }
+  .foot-note code { color: var(--text-dim); }
+  .foot-event { font-size: 13px; color: var(--text-dim); }
+
+  @media (max-width: 640px) {
+    section { padding: 60px 0; }
+    .hero { padding: 72px 0 60px; }
+    .counter { min-width: 132px; flex: 1; }
+    .pl-arrow { display: none; }
+    .pl-step { flex: 1 1 44%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="wrap">
+    <div class="badges">
+      <span class="badge"><span class="dot"></span>Casper Testnet</span>
+      <span class="badge"><span class="dot"></span>x402 pay-then-deliver</span>
+      <span class="badge"><span class="dot"></span>MCP tool surface</span>
+    </div>
+    <h1><span class="proj">Casper Pay Guard</span><br>An economic canary for pay-then-deliver agent markets.</h1>
+    <p class="hero-sub">
+      It pays x402 endpoints their minimum advertised price, <strong>verifies what actually comes back</strong>,
+      and tells you whether your next routed call will get anything for its money.
+    </p>
+    <p class="hero-hook">
+      A provider can accept your payment, let settlement confirm on-chain, and deliver <b>nothing</b>.
+      Your uptime monitor scores the thief healthy. The only unspoofable signal is a real paid call.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" id="link-repo" href="https://github.com/DogukanGun/x402-economic-canary" target="_blank" rel="noopener">View the code &nbsp;→</a>
+      <a class="btn btn-ghost" id="link-video" href="#">▶&nbsp; Watch the demo</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= DEMO PANEL ================= -->
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="kicker">Interactive demo</div>
+    <h2>The market at a glance</h2>
+    <p class="section-lede">
+      Eight x402 provider endpoints. The <b>Monitor</b> column is what a liveness dashboard sees —
+      every endpoint answers the unauthenticated check with a well-formed <code>402</code>, so every
+      endpoint is “healthy”. The <b>Canary</b> column is what you learn by actually paying.
+    </p>
+
+    <div class="demo-controls">
+      <button class="btn btn-primary" id="run-sweep">Run canary sweep</button>
+      <div class="counter spent">
+        <div class="label">Spent (USDC)</div>
+        <div class="value" id="spent-counter">0.000</div>
+      </div>
+      <div class="counter wasted" id="wasted-box">
+        <div class="label">Wasted USDC</div>
+        <div class="value" id="wasted-counter">0.000</div>
+      </div>
+    </div>
+
+    <div class="provider-grid" id="provider-grid"><!-- cards injected --></div>
+
+    <div class="log-panel">
+      <div class="log-head">
+        <span class="title">Probe log</span>
+        <span class="gap-note">gap = settlement → first byte of the response</span>
+      </div>
+      <div class="log-scroll">
+        <table class="log" id="probe-log" hidden>
+          <thead>
+            <tr>
+              <th>endpoint</th><th>verdict</th><th>http</th><th>latency</th><th>gap</th><th>price</th><th>tx</th>
+            </tr>
+          </thead>
+          <tbody id="probe-log-body"></tbody>
+        </table>
+      </div>
+      <div class="log-empty" id="log-empty">// no probes yet — run a sweep. every row below is a payment that settled.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NUMBERS ================= -->
+<section id="numbers">
+  <div class="wrap">
+    <div class="kicker">The numbers</div>
+    <h2>Reproduced bit-for-bit, not to a tolerance</h2>
+    <p class="section-lede">
+      <code>make reproduce</code> regenerates every published value exactly — all 22 asserted by
+      <code>tests/test_reproduce.py</code> — from a 7,200-probe simulated x402 corpus.
+    </p>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="num">0.994</div>
+        <div class="name">Stalled precision</div>
+        <div class="sub">When it says the provider is robbing you, it is.</div>
+      </div>
+      <div class="stat">
+        <div class="num">0.983</div>
+        <div class="name">Stalled recall</div>
+        <div class="sub">Settled-but-stalled providers it catches.</div>
+      </div>
+      <div class="stat">
+        <div class="num">0.861</div>
+        <div class="name">PR-AUC</div>
+        <div class="sub">Across every operating threshold.</div>
+      </div>
+      <div class="stat">
+        <div class="num">0.0029</div>
+        <div class="name">Brier score</div>
+        <div class="sub">The P(delivery) it quotes is calibrated, not vibes.</div>
+      </div>
+      <div class="stat">
+        <div class="num">2 <small>calls</small></div>
+        <div class="name">Median detection latency</div>
+        <div class="sub">CUSUM flips a verdict after ~2 paid probes of genuine degradation.</div>
+      </div>
+      <div class="stat">
+        <div class="num">1465 <small>calls</small></div>
+        <div class="name">ARL to false alarm</div>
+        <div class="sub">One false flip per ~1,465 healthy calls. It doesn’t twitch.</div>
+      </div>
+      <div class="stat">
+        <div class="num">1.9e-196</div>
+        <div class="name">McNemar p vs liveness</div>
+        <div class="sub">Against “402 answered, so it’s healthy” monitoring. Not a close call.</div>
+      </div>
+    </div>
+
+    <div class="fine-print">
+      <strong>Honesty box.</strong> The headline numbers grade the paper’s published oracle-mode configuration.
+      The deployable framing — <em>forecast</em> mode, predicting your <em>next</em> call from endpoint history only —
+      scores stalled precision <b>0.944</b> / recall <b>0.723</b> (PR-AUC 0.898, Brier 0.110), missing two of the
+      paper’s own targets; reported as computed, nothing tuned to close them. All numbers are simulation-derived —
+      no mainnet or testnet funds moved to produce them. Paper:
+      <a href="https://zenodo.org/record/21515696" target="_blank" rel="noopener">Zenodo&nbsp;10.5281/zenodo.21515696</a>.
+    </div>
+  </div>
+</section>
+
+<!-- ================= ON-CHAIN ================= -->
+<section class="chain" id="onchain">
+  <div class="wrap">
+    <div class="chain-flex">
+      <div class="chain-copy">
+        <div class="kicker">Settlement</div>
+        <h2>On-chain settlement on Casper Testnet</h2>
+        <p>
+          The canary’s point is that settlement is the part that <em>always</em> works — the thief’s half of
+          the trade confirms beautifully. Here is a canary payment settled for real on Casper Testnet:
+          the money moved, the deploy is public, and the verdict on what came back is the canary’s, not the chain’s.
+        </p>
+        <p>
+          Signing is genuine EIP-712; every signature recovers to the payer address. The payer key is
+          funded with dust and nothing more.
+        </p>
+      </div>
+      <div class="receipt">
+        <div class="receipt-top">
+          <span class="rt">Settlement receipt</span>
+          <span class="settled">SETTLED ✓</span>
+        </div>
+        <div class="receipt-body">
+          <div class="rrow"><span class="k">Network</span><span class="v">casper:casper-test</span></div>
+          <div class="rrow"><span class="k">Asset</span><span class="v">CSPR (testnet)</span></div>
+          <div class="rrow"><span class="k">Amount</span><span class="v">minimum advertised price · 0.001 USDC-equivalent</span></div>
+          <div class="rrow"><span class="k">Deploy hash</span><span class="v hash" id="deploy-hash">687c0f2ecfb9fc9e191779449b4945f8ac46533e5e832b0167533a574daba2ab</span></div>
+        </div>
+        <div class="receipt-foot">
+          <a id="deploy-link" href="https://testnet.cspr.live/deploy/687c0f2ecfb9fc9e191779449b4945f8ac46533e5e832b0167533a574daba2ab" target="_blank" rel="noopener">View on testnet.cspr.live →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section id="how">
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2>Pay like a customer, check like a skeptic</h2>
+    <p class="section-lede">
+      Every probe is a real x402 purchase graded into a four-way taxonomy. <code>stalled</code> is the class
+      incumbents structurally cannot represent — reaching it requires having <em>paid</em> and knowing what
+      a good body looks like.
+    </p>
+
+    <div class="tax-grid">
+      <div class="tax">
+        <span class="chip chip-delivered"><span class="cdot"></span>delivered</span>
+        <p><strong>Settled, and the body validates</strong> against the schema the provider advertised.</p>
+      </div>
+      <div class="tax">
+        <span class="chip chip-degraded"><span class="cdot"></span>degraded</span>
+        <p><strong>Settled, body empty or schema-violating.</strong> You paid for an artifact and got a shrug.</p>
+      </div>
+      <div class="tax">
+        <span class="chip chip-stalled"><span class="cdot"></span>stalled</span>
+        <p><strong>Settled, no 2xx inside <code>maxTimeoutSeconds</code>.</strong> The money moved; nothing came back.</p>
+      </div>
+      <div class="tax">
+        <span class="chip chip-unreachable"><span class="cdot"></span>unreachable</span>
+        <p><strong>Never got far enough to pay.</strong> The one failure mode ordinary monitoring does see.</p>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pl-step"><div class="n">01</div><div class="t">handshake</div><div class="d">GET → 402 → retry, streamed, monotonic clocks</div></div>
+      <span class="pl-arrow">→</span>
+      <div class="pl-step"><div class="n">02</div><div class="t">sign</div><div class="d">real EIP-3009 / EIP-712 via eth-account</div></div>
+      <span class="pl-arrow">→</span>
+      <div class="pl-step"><div class="n">03</div><div class="t">settle</div><div class="d">facilitator settles; the clock starts here</div></div>
+      <span class="pl-arrow">→</span>
+      <div class="pl-step"><div class="n">04</div><div class="t">verify</div><div class="d">schema validation of the artifact itself</div></div>
+      <span class="pl-arrow">→</span>
+      <div class="pl-step"><div class="n">05</div><div class="t">classify</div><div class="d">the four-way delivery verdict</div></div>
+      <span class="pl-arrow">→</span>
+      <div class="pl-step"><div class="n">06</div><div class="t">CUSUM</div><div class="d">flips on sustained failure, not one bad call</div></div>
+      <span class="pl-arrow">→</span>
+      <div class="pl-step"><div class="n">07</div><div class="t">MCP tool</div><div class="d">a priced tool any agent can call before routing</div></div>
+    </div>
+    <p class="pipeline-note">
+      <strong>The measurement that matters is the settlement-to-response gap — and when it starts.</strong>
+      Settlement consumes the authorization; it does not wait on the origin. Start the clock at the origin’s
+      headers and a provider that takes your money then withholds its status line reports a near-zero gap —
+      the endpoint robbing you grades as the fastest. The canary starts the clock at settlement, which is
+      exactly why <code>stalled_silent</code> grades correctly.
+    </p>
+
+    <div class="mcp-tools">
+      <div class="mcp-tool">
+        <div class="tn">probe_asp_liveness</div>
+        <p>Pays the endpoint, verifies the artifact, returns a verdict plus the settlement receipt. Call it before committing a routed payment.</p>
+      </div>
+      <div class="mcp-tool">
+        <div class="tn">canary_spend_report</div>
+        <p>Reconciles money spent against artifacts received, from the SQLite ledger. Settled-minus-delivered is the theft line.</p>
+      </div>
+      <div class="mcp-tool">
+        <div class="tn">canary_metrics</div>
+        <p>Prometheus exposition of delivery rate, p95 latency, settlement gap, and spend — the canary as infrastructure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap foot-flex">
+    <div>
+      <div class="foot-brand">Casper Pay Guard <span>//</span> economic canary</div>
+      <div class="foot-event">Casper Agentic Buildathon 2026</div>
+    </div>
+    <p class="foot-note">
+      Built honestly: the EIP-712 signing is real and recovers to the payer address; the results are
+      published, reproducible research (<a href="https://zenodo.org/record/21515696" target="_blank" rel="noopener">Zenodo 10.5281/zenodo.21515696</a>);
+      and no mainnet funds are touched — <code>SettlementReceipt.on_chain</code> is <code>False</code> for
+      everything the repo alone can produce.
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // Deterministic scripted sweep. Latencies/gaps are consistent with the repo's
+  // mock ASP: delivered gaps are tens of ms; stalled_silent hits the ~1000 ms
+  // maxTimeoutSeconds cap (README shows latency 1015.2 ms / gap 1001.6 ms).
+  var PRICE = 0.001;
+  var PROVIDERS = [
+    { name: "asp-vision-api",   path: "/asp/vision/caption",  verdict: "delivered", http: "200", latency: 182.4,  gap: 34.1,   tx: "0x8f2c1ab34de90f12a6" },
+    { name: "asp-translate",    path: "/asp/translate/v1",    verdict: "delivered", http: "200", latency: 96.3,   gap: 21.7,   tx: "0x3be97d02c41aa8e05f" },
+    { name: "asp-quant-feed",   path: "/asp/quant/ticks",     verdict: "stalled",   http: "—",   latency: 1015.2, gap: 1001.6, tx: "0xd41f7a90b3c25e88c1", villain: true, note: "silent timeout — body never arrived" },
+    { name: "asp-embeddings",   path: "/asp/embed/batch",     verdict: "delivered", http: "200", latency: 143.8,  gap: 28.9,   tx: "0x71a3e5f8d20b94c6d3" },
+    { name: "asp-ocr-batch",    path: "/asp/ocr/pdf",         verdict: "degraded",  http: "200", latency: 88.1,   gap: 19.4,   tx: "0xa95c04d1e7f36b20b8", note: "empty body — schema check failed" },
+    { name: "asp-geocode",      path: "/asp/geo/forward",     verdict: "delivered", http: "200", latency: 74.6,   gap: 18.2,   tx: "0x5e08b6a2f9d17c43ea" },
+    { name: "asp-alpha-signals",path: "/asp/signals/daily",   verdict: "stalled",   http: "502", latency: 231.5,  gap: 212.0,  tx: "0xc27d93e0a41f58b671", note: "fast 5xx after settlement" },
+    { name: "asp-tts-stream",   path: "/asp/tts/stream",      verdict: "delivered", http: "200", latency: 167.9,  gap: 41.3,   tx: "0x9640fb1c85d2ae37f4" }
+  ];
+
+  var grid = document.getElementById("provider-grid");
+  var runBtn = document.getElementById("run-sweep");
+  var spentEl = document.getElementById("spent-counter");
+  var wastedEl = document.getElementById("wasted-counter");
+  var wastedBox = document.getElementById("wasted-box");
+  var logTable = document.getElementById("probe-log");
+  var logBody = document.getElementById("probe-log-body");
+  var logEmpty = document.getElementById("log-empty");
+
+  var spent = 0, wasted = 0, running = false;
+
+  function fmt(v) { return v.toFixed(3); }
+
+  function buildCards() {
+    grid.innerHTML = "";
+    PROVIDERS.forEach(function (p, i) {
+      var card = document.createElement("div");
+      card.className = "pcard";
+      card.id = "pcard-" + i;
+      card.innerHTML =
+        '<div class="pcard-head">' +
+          '<span class="pcard-name">' + p.name + "</span>" +
+          '<span class="pcard-price">0.001 USDC</span>' +
+        "</div>" +
+        '<div class="pcard-path">' + p.path + "</div>" +
+        (p.villain ? '<span class="villain-tag">stalled_silent</span>' : "") +
+        '<div class="verdict-pair">' +
+          '<div class="verdict-box">' +
+            '<div class="src">Monitor</div>' +
+            '<span class="chip chip-healthy"><span class="cdot"></span>HEALTHY</span>' +
+            '<div class="verdict-meta">402 answered · up</div>' +
+          "</div>" +
+          '<div class="verdict-box">' +
+            '<div class="src">Canary</div>' +
+            '<span class="chip chip-idle" id="canary-chip-' + i + '"><span class="cdot"></span>—</span>' +
+            '<div class="verdict-meta" id="canary-meta-' + i + '">not probed</div>' +
+          "</div>" +
+        "</div>";
+      grid.appendChild(card);
+    });
+  }
+
+  function setChip(i, cls, label, spinnerFirst) {
+    var chip = document.getElementById("canary-chip-" + i);
+    chip.className = "chip " + cls;
+    chip.innerHTML = (spinnerFirst ? '<span class="spinner"></span>' : '<span class="cdot"></span>') + label;
+  }
+
+  function appendLog(p) {
+    logEmpty.hidden = true;
+    logTable.hidden = false;
+    var tr = document.createElement("tr");
+    tr.className = "new-row";
+    tr.innerHTML =
+      '<td class="ep">' + p.name + "</td>" +
+      '<td class="v-' + p.verdict + '">' + p.verdict + "</td>" +
+      "<td>" + p.http + "</td>" +
+      "<td>" + p.latency.toFixed(1) + " ms</td>" +
+      "<td>" + p.gap.toFixed(1) + " ms</td>" +
+      "<td>" + PRICE.toFixed(3) + "</td>" +
+      '<td class="tx">' + p.tx + "…</td>";
+    logBody.appendChild(tr);
+  }
+
+  function probeCard(i, done) {
+    var p = PROVIDERS[i];
+    var card = document.getElementById("pcard-" + i);
+    var meta = document.getElementById("canary-meta-" + i);
+    card.classList.add("probing");
+    setChip(i, "chip-probing", "probing…", true);
+    meta.textContent = "paid 0.001 · awaiting body";
+
+    // stalled probes visibly take longer — the timeout is the story
+    var wait = p.verdict === "stalled" && p.http === "—" ? 1500 : 620;
+
+    setTimeout(function () {
+      card.classList.remove("probing");
+      setChip(i, "chip-" + p.verdict, p.verdict.toUpperCase(), false);
+
+      spent += PRICE;
+      spentEl.textContent = fmt(spent);
+
+      if (p.verdict === "delivered") {
+        meta.innerHTML = "200 · gap " + p.gap.toFixed(1) + " ms · schema ok";
+      } else {
+        card.classList.add("done-" + p.verdict);
+        meta.innerHTML = '<span class="bad">' + (p.note || "settled, nothing usable") + "</span>";
+        wasted += PRICE;
+        wastedEl.textContent = fmt(wasted);
+        wastedBox.classList.remove("flash");
+        void wastedBox.offsetWidth; // restart animation
+        wastedBox.classList.add("flash");
+      }
+
+      appendLog(p);
+      done();
+    }, wait);
+  }
+
+  function resetDemo() {
+    spent = 0; wasted = 0;
+    spentEl.textContent = fmt(0);
+    wastedEl.textContent = fmt(0);
+    logBody.innerHTML = "";
+    logTable.hidden = true;
+    logEmpty.hidden = false;
+    buildCards();
+  }
+
+  runBtn.addEventListener("click", function () {
+    if (running) return;
+    running = true;
+    resetDemo();
+    runBtn.textContent = "Sweeping…";
+    runBtn.style.opacity = "0.6";
+    runBtn.style.cursor = "wait";
+
+    var i = 0;
+    (function next() {
+      if (i >= PROVIDERS.length) {
+        running = false;
+        runBtn.textContent = "Run sweep again";
+        runBtn.style.opacity = "";
+        runBtn.style.cursor = "";
+        return;
+      }
+      probeCard(i++, function () { setTimeout(next, 220); });
+    })();
+  });
+
+  buildCards();
+})();
+</script>
+
+</body>
+</html>

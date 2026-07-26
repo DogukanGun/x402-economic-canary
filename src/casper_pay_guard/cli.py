@@ -29,9 +29,12 @@ def _cmd_probe(argv: list[str]) -> int:
     ap.add_argument("--json", action="store_true", help="emit raw JSON")
     args = ap.parse_args(argv)
 
+    from casper_pay_guard.x402.facilitator import facilitator_from_env
     from casper_pay_guard.x402.handshake import X402HandshakeClient
 
-    client = X402HandshakeClient()
+    # Env-selected settlement: CASPER_SETTLE=casper-testnet moves real CSPR on
+    # Casper Testnet; default remains the free metering stub.
+    client = X402HandshakeClient(facilitator=facilitator_from_env())
     result = asyncio.run(
         client.probe(
             args.url, timeout_s=args.timeout, max_price_usdc=args.max_price, retries=args.retries

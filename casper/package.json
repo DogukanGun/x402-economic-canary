@@ -1,0 +1,8 @@
+{
+  "name": "casper-settler",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "casper-js-sdk": "5.0.12"
+  }
+}

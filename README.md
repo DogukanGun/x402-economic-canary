@@ -1,8 +1,15 @@
-# casper_pay_guard
+# Casper Pay Guard
 
 **An economic canary for pay-then-deliver agent markets.** It pays x402 endpoints
 their minimum advertised price, verifies what actually comes back, and tells you
 whether your next routed call will get anything for its money.
+
+> **Casper Agentic Buildathon 2026 — Final Round submission.**
+> Live demo: [casper-pay-guard.vercel.app](https://casper-pay-guard.vercel.app) ·
+> Demo video: _(link pending)_ ·
+> Real settlement on Casper Testnet:
+> [`687c0f2e…`](https://testnet.cspr.live/deploy/687c0f2ecfb9fc9e191779449b4945f8ac46533e5e832b0167533a574daba2ab)
+> — see [Casper Testnet settlement](#casper-testnet-settlement).
 
 x402 is trustless at the payment layer and trust-maximal at the delivery layer.
 There is no escrow, no conditional release, and nothing in the protocol that
@@ -140,10 +147,40 @@ the code disagree about. All of it is implemented, measured, and written down �
 including the two acceptance targets the honest forecast-mode configuration
 misses.
 
+## Casper Testnet settlement
+
+For the Casper Agentic Buildathon, the canary gained a third settlement
+backend: `CasperFacilitator` settles each probe as a **real native CSPR
+transfer on `casper-test`** and stamps the receipt with the on-chain
+transaction hash (`on_chain: true`). Selection is by environment:
+
+```bash
+export CASPER_SETTLE=casper-testnet
+export CASPER_PEM_PATH=.keys/casper_testnet_ed25519.pem   # payer key (fund via testnet faucet)
+export CASPER_PAYEE_PUBKEY=01…                            # the provider being paid
+.venv/bin/python -m casper_pay_guard.cli probe http://127.0.0.1:8402/asp/honest
+```
+
+Or settle directly:
+
+```bash
+node casper/settle.mjs --pem .keys/casper_testnet_ed25519.pem \
+    --to <payee-public-key-hex> --motes 2500000000
+```
+
+Notes: Casper native transfers have a 2.5 CSPR protocol minimum, so each
+settled probe moves 2.5 CSPR on testnet while the ledger keeps the advertised
+x402 USDC price for comparability (`asset: "CSPR"` on the receipt records what
+actually moved). Full CEP-18 `transfer_with_authorization` through Casper's
+hosted x402 facilitator (`https://x402-facilitator.cspr.cloud`, scheme `exact`,
+network `casper:casper-test`) is the stated next step on live rails; the
+`HttpFacilitator` hook for it is already wired via `CASPER_FACILITATOR_URL`.
+
 ## Scope and honesty
 
-- **No money has moved.** Every number is simulated or comes from the local mock
-  ASP. No mainnet or testnet transaction has been broadcast.
+- **No mainnet money has moved.** Every published number is simulated or comes
+  from the local mock ASP. The only real transactions this project produces are
+  the Casper Testnet settlement demos described above — test CSPR, no real value.
 - **Signing is real, settlement is stubbed.** Signatures are genuine EIP-712 and
   recover to the payer address. The default facilitator mints deterministic
   receipts against a SQLite ledger and never touches a chain.

@@ -19,3 +19,7 @@ dist/
 # Secrets — the canary's payer key must never be committed
 .env
 *.key
+.keys/
+node_modules/
+.vercel/
+.env.local

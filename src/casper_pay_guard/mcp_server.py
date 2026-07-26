@@ -32,7 +32,7 @@ from pydantic import Field
 
 from casper_pay_guard import observability
 from casper_pay_guard.ledger import Ledger
-from casper_pay_guard.x402.facilitator import HttpFacilitator, MeteringFacilitator
+from casper_pay_guard.x402.facilitator import MeteringFacilitator, facilitator_from_env
 from casper_pay_guard.x402.handshake import X402HandshakeClient
 from casper_pay_guard.x402.signer import Eip3009Signer
 from casper_pay_guard.x402.types import ProbeResult
@@ -54,23 +54,20 @@ def get_client() -> X402HandshakeClient:
         return _client
 
     ledger = Ledger(_ledger_path())
-    facilitator_url = os.environ.get("CASPER_FACILITATOR_URL")
-    if facilitator_url:
-        # Live rails. Requires a funded payer; nothing in this repo exercises it.
-        facilitator: Any = HttpFacilitator(
-            facilitator_url, ledger=ledger, api_key=os.environ.get("CASPER_FACILITATOR_KEY")
-        )
+    # CASPER_SETTLE=casper-testnet -> real CSPR transfers on Casper Testnet;
+    # CASPER_FACILITATOR_URL -> live HTTP facilitator; default -> metering stub.
+    facilitator: Any = facilitator_from_env(ledger=ledger)
+    on_chain = not isinstance(facilitator, MeteringFacilitator)
+    if on_chain:
         _logger.warning(
             "live facilitator configured — probes will attempt real settlement",
-            extra={"extra_fields": {"facilitator_url": facilitator_url}},
+            extra={"extra_fields": {"facilitator": type(facilitator).__name__}},
         )
-    else:
-        facilitator = MeteringFacilitator(ledger=ledger)
 
     signer = Eip3009Signer()
     _logger.info(
         "canary ready",
-        extra={"extra_fields": {"payer": signer.address, "on_chain": bool(facilitator_url)}},
+        extra={"extra_fields": {"payer": signer.address, "on_chain": on_chain}},
     )
     _client = X402HandshakeClient(facilitator=facilitator, signer=signer, ledger=ledger)
     return _client

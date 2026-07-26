@@ -18,6 +18,7 @@ Two implementations behind one Protocol:
 
 from __future__ import annotations
 
+import os
 import secrets
 import time
 from typing import Any, Protocol, runtime_checkable
@@ -120,6 +121,34 @@ class MeteringFacilitator:
         )
         self.ledger.record_settlement(receipt, target_url=target_url)
         return receipt
+
+
+def facilitator_from_env(ledger: Ledger | None = None) -> Any:
+    """Pick the settlement facilitator from the environment.
+
+    Precedence (default behavior unchanged):
+
+    1. ``CASPER_SETTLE=casper-testnet`` — :class:`~casper_pay_guard.x402.
+       casper_facilitator.CasperFacilitator`: real native CSPR transfers on
+       Casper Testnet via the ``casper/settle.mjs`` helper. Needs a funded
+       payer PEM (``CASPER_PEM_PATH``) and a recipient
+       (``CASPER_PAYEE_PUBKEY``).
+    2. ``CASPER_FACILITATOR_URL`` — :class:`HttpFacilitator` against a live
+       x402 facilitator (``CASPER_FACILITATOR_KEY`` optional).
+    3. otherwise — the free :class:`MeteringFacilitator` stub.
+    """
+    mode = os.environ.get("CASPER_SETTLE", "").strip().lower()
+    if mode == "casper-testnet":
+        # Imported lazily: casper_facilitator imports from this module.
+        from casper_pay_guard.x402.casper_facilitator import CasperFacilitator
+
+        return CasperFacilitator(ledger=ledger)
+    facilitator_url = os.environ.get("CASPER_FACILITATOR_URL")
+    if facilitator_url:
+        return HttpFacilitator(
+            facilitator_url, ledger=ledger, api_key=os.environ.get("CASPER_FACILITATOR_KEY")
+        )
+    return MeteringFacilitator(ledger=ledger) if ledger is not None else MeteringFacilitator()
 
 
 class HttpFacilitator:
