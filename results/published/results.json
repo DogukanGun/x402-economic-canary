@@ -1,0 +1,143 @@
+{
+  "status": "ok",
+  "problem_id": "topic-an-agent-facing-an-x402-challenge-from-a-c20321",
+  "approach": "economic-canary (priced pay-then-deliver probe + artifact verification)",
+  "baselines": [
+    "always-pay",
+    "402-as-healthy-liveness",
+    "marketplace-ratings"
+  ],
+  "metrics": {
+    "economic-canary": {
+      "precision": 0.9943100995732574,
+      "recall": 0.9831223628691983,
+      "f2": 0.9853397237101776,
+      "pr_auc": 0.8610113091299968,
+      "brier": 0.0028841377704232653,
+      "reliability": 0.0006504973731149726,
+      "resolution": 0.1990799821388987,
+      "uncertainty": 0.20135524691358028
+    },
+    "always-pay": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f2": 0.0,
+      "pr_auc": 0.1975
+    },
+    "402-as-healthy-liveness": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f2": 0.0,
+      "pr_auc": 0.1975
+    },
+    "marketplace-ratings": {
+      "precision": 0.39444444444444443,
+      "recall": 0.39943741209563993,
+      "f2": 0.3984287317620651,
+      "pr_auc": 0.3551501230570552
+    },
+    "brier_decomposition": {
+      "brier": 0.0028841377704232653,
+      "reliability": 0.0006504973731149726,
+      "resolution": 0.1990799821388987,
+      "uncertainty": 0.20135524691358028,
+      "recomposed": 0.002925762147796579
+    },
+    "cusum": {
+      "median_latency_calls": 2.0,
+      "mean_latency_calls": 2.625,
+      "p95_latency_calls": 5.0,
+      "detection_rate": 1.0,
+      "arl_to_false_alarm": 1465.1125
+    },
+    "usdc_saved_per_call": {
+      "ips": 0.00022292979410728012,
+      "snips": 3.999469496261156e-05,
+      "dr": 0.0002782179371421615,
+      "dr_ci_low": 0.00026011857979146597,
+      "dr_ci_high": 0.0002951632071679316,
+      "dr_ci_excludes_zero": true,
+      "all_positive": true
+    },
+    "significance": {
+      "mcnemar": {
+        "402-as-healthy-liveness": {
+          "p_value": 1.8916719623966624e-196,
+          "b": 908,
+          "c": 4
+        },
+        "marketplace-ratings": {
+          "p_value": 5.9042090569010235e-182,
+          "b": 856,
+          "c": 9
+        },
+        "always-pay": {
+          "p_value": 5.1587773963045425e-151,
+          "b": 699,
+          "c": 4
+        }
+      },
+      "delong": {
+        "402-as-healthy-liveness": {
+          "auc_canary": 0.961870015710204,
+          "auc_baseline": 0.463828314295604,
+          "p_value": 0.0
+        },
+        "marketplace-ratings": {
+          "auc_canary": 0.961870015710204,
+          "auc_baseline": 0.7793806859424589,
+          "p_value": 0.0
+        }
+      }
+    },
+    "ablation_dr_saved_by_price": {
+      "price_0.001": 0.000228,
+      "price_0.005": 0.001345,
+      "price_0.02": 0.005532
+    },
+    "mcp_smoke": {
+      "passed": true,
+      "labels": {
+        "delivered": "delivered",
+        "degraded": "degraded",
+        "stalled": "stalled",
+        "unreachable": "unreachable"
+      }
+    },
+    "validation_criteria": {
+      "precision>=0.90": true,
+      "recall>=0.85": true,
+      "pr_auc>=0.80": true,
+      "brier<=0.10": true,
+      "reliability<0.02": true,
+      "cusum_latency<=3": true,
+      "arl>=500": true,
+      "usdc_saved_all_positive": true,
+      "dr_ci_excludes_zero": true,
+      "mcnemar_liveness_p<0.05": true,
+      "mcnemar_ratings_p<0.05": true,
+      "delong_liveness_p<0.05": true,
+      "delong_ratings_p<0.05": true,
+      "mcp_smoke_all_four_labels": true
+    },
+    "validation_passed": 14,
+    "validation_total": 14
+  },
+  "config": {
+    "n_endpoints": 60,
+    "trials_per_endpoint": 120,
+    "train_probes": 3600,
+    "test_probes": 3600,
+    "split_t": 60,
+    "classifier": "StandardScaler+LogisticRegression(C=2)",
+    "framing": "oracle-mode (same-probe post-payment features)",
+    "chains": [
+      196,
+      84532
+    ],
+    "min_price_usdc": 0.001,
+    "seed": 2026,
+    "note": "numpy-only simulation of the x402 pay-then-deliver canary; no torch/network/chain calls."
+  },
+  "errors": []
+}

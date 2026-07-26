@@ -1,0 +1,62 @@
+{
+  "published (frozen)": {
+    "criteria": {
+      "precision>=0.90": true,
+      "recall>=0.85": true,
+      "pr_auc>=0.80": true,
+      "brier<=0.10": true,
+      "reliability<0.02": true,
+      "cusum_latency<=3": true,
+      "arl>=500": true,
+      "usdc_saved_all_positive": true,
+      "dr_ci_excludes_zero": true,
+      "mcnemar_liveness_p<0.05": true,
+      "mcnemar_ratings_p<0.05": true,
+      "delong_liveness_p<0.05": true,
+      "delong_ratings_p<0.05": true,
+      "mcp_smoke_all_four_labels": true
+    },
+    "passed": 14,
+    "total": 14
+  },
+  "paper-spec / oracle": {
+    "criteria": {
+      "precision>=0.90": true,
+      "recall>=0.85": true,
+      "pr_auc>=0.80": true,
+      "brier<=0.10": true,
+      "reliability<0.02": true,
+      "cusum_latency<=3": true,
+      "arl>=500": true,
+      "usdc_saved_all_positive": true,
+      "dr_ci_excludes_zero": true,
+      "mcnemar_liveness_p<0.05": true,
+      "mcnemar_ratings_p<0.05": true,
+      "delong_liveness_p<0.05": true,
+      "delong_ratings_p<0.05": true,
+      "mcp_smoke_all_four_labels": true
+    },
+    "passed": 14,
+    "total": 14
+  },
+  "paper-spec / forecast": {
+    "criteria": {
+      "precision>=0.90": true,
+      "recall>=0.85": false,
+      "pr_auc>=0.80": true,
+      "brier<=0.10": false,
+      "reliability<0.02": true,
+      "cusum_latency<=3": true,
+      "arl>=500": true,
+      "usdc_saved_all_positive": true,
+      "dr_ci_excludes_zero": true,
+      "mcnemar_liveness_p<0.05": true,
+      "mcnemar_ratings_p<0.05": true,
+      "delong_liveness_p<0.05": true,
+      "delong_ratings_p<0.05": true,
+      "mcp_smoke_all_four_labels": true
+    },
+    "passed": 12,
+    "total": 14
+  }
+}

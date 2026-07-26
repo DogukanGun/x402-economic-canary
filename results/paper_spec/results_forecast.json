@@ -1,0 +1,207 @@
+{
+  "status": "ok",
+  "spec": "paper Section 5",
+  "approach": "economic-canary (forecast mode)",
+  "baselines": [
+    "always-pay",
+    "402-as-healthy-liveness",
+    "marketplace-ratings"
+  ],
+  "metrics": {
+    "economic-canary": {
+      "precision": 0.9437030859049208,
+      "recall": 0.7225415070242657,
+      "f2": 0.7580731609272412,
+      "pr_auc": 0.8975728794451152,
+      "brier": 0.10980815990137346,
+      "reliability": 0.0008564707312985922,
+      "resolution": 0.13987173950411275,
+      "uncertainty": 0.24850918209876544
+    },
+    "always-pay": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f2": 0.0,
+      "pr_auc": 0.435
+    },
+    "402-as-healthy-liveness": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f2": 0.0,
+      "pr_auc": 0.435
+    },
+    "marketplace-ratings": {
+      "precision": 0.48048780487804876,
+      "recall": 0.3773946360153257,
+      "f2": 0.39431545236188953,
+      "pr_auc": 0.4900226587103871
+    },
+    "brier_decomposition": {
+      "brier": 0.10980815990137346,
+      "reliability": 0.0008564707312985922,
+      "resolution": 0.13987173950411275,
+      "uncertainty": 0.24850918209876544,
+      "recomposed": 0.10949391332595129
+    },
+    "confidence_intervals": {
+      "stalled_precision": {
+        "point": 0.9437030859049208,
+        "ci_low": 0.9268154053397233,
+        "ci_high": 0.9565098561015289,
+        "n_boot": 2000
+      },
+      "stalled_recall": {
+        "point": 0.7225415070242657,
+        "ci_low": 0.6348367798608713,
+        "ci_high": 0.7986839729476344,
+        "n_boot": 2000
+      },
+      "pr_auc": {
+        "point": 0.8975728794451152,
+        "ci_low": 0.8581491134571093,
+        "ci_high": 0.9249174719689458,
+        "n_boot": 2000
+      },
+      "brier": {
+        "point": 0.10980815990137346,
+        "ci_low": 0.09328989500424485,
+        "ci_high": 0.12747504044161134,
+        "n_boot": 2000
+      }
+    },
+    "cusum": {
+      "median_latency_calls": 2.0,
+      "mean_latency_calls": 2.625,
+      "p95_latency_calls": 5.0,
+      "detection_rate": 1.0,
+      "arl_to_false_alarm": 1465.1125,
+      "params": {
+        "mu0": 0.98,
+        "k": 0.25,
+        "threshold": 1.8
+      }
+    },
+    "usdc_saved_by_policy": {
+      "soft": {
+        "ips": -0.0015317981327198325,
+        "snips": -0.0014991997619295643,
+        "dr": -0.0015675536358995025,
+        "dr_ci_low": -0.0016206825806692447,
+        "dr_ci_high": -0.0015151456740354632,
+        "dr_ci_excludes_zero": true,
+        "all_positive": false,
+        "pay_rate": 0.5579718993585789
+      },
+      "ev": {
+        "ips": 0.0001372959908636194,
+        "snips": 0.00010792845404734679,
+        "dr": 9.960977057075528e-05,
+        "dr_ci_low": 6.217319397392213e-05,
+        "dr_ci_high": 0.00013681130250667675,
+        "dr_ci_excludes_zero": true,
+        "all_positive": true,
+        "pay_rate": 0.7971111111111111
+      }
+    },
+    "usdc_saved_per_call": {
+      "policy": "ev",
+      "ips": 0.0001372959908636194,
+      "snips": 0.00010792845404734679,
+      "dr": 9.960977057075528e-05,
+      "dr_ci_low": 6.217319397392213e-05,
+      "dr_ci_high": 0.00013681130250667675,
+      "dr_ci_excludes_zero": true,
+      "all_positive": true,
+      "pay_rate": 0.7971111111111111
+    },
+    "significance": {
+      "mcnemar": {
+        "always-pay": {
+          "p_value": 0.0,
+          "b": 2263,
+          "c": 135
+        },
+        "402-as-healthy-liveness": {
+          "p_value": 0.0,
+          "b": 2334,
+          "c": 135
+        },
+        "marketplace-ratings": {
+          "p_value": 1.7877133205752578e-302,
+          "b": 2900,
+          "c": 676
+        }
+      },
+      "delong": {
+        "402-as-healthy-liveness": {
+          "auc_canary": 0.9221985034741452,
+          "auc_baseline": 0.4912733529990167,
+          "p_value": 0.0
+        },
+        "marketplace-ratings": {
+          "auc_canary": 0.9221985034741452,
+          "auc_baseline": 0.6301909681016588,
+          "p_value": 0.0
+        }
+      }
+    },
+    "mcp_smoke": {
+      "passed": true,
+      "labels": {
+        "delivered": "delivered",
+        "degraded": "degraded",
+        "stalled": "stalled",
+        "unreachable": "unreachable"
+      }
+    },
+    "validation_criteria": {
+      "precision>=0.90": true,
+      "recall>=0.85": false,
+      "pr_auc>=0.80": true,
+      "brier<=0.10": false,
+      "reliability<0.02": true,
+      "cusum_latency<=3": true,
+      "arl>=500": true,
+      "usdc_saved_all_positive": true,
+      "dr_ci_excludes_zero": true,
+      "mcnemar_liveness_p<0.05": true,
+      "mcnemar_ratings_p<0.05": true,
+      "delong_liveness_p<0.05": true,
+      "delong_ratings_p<0.05": true,
+      "mcp_smoke_all_four_labels": true
+    },
+    "validation_passed": 12,
+    "validation_total": 14
+  },
+  "config": {
+    "n_endpoints": 120,
+    "trials_per_endpoint": 150,
+    "n_probes": 18000,
+    "train_probes": 10800,
+    "test_probes": 7200,
+    "seed": 42,
+    "train_fraction": 0.6,
+    "profiles": {
+      "honest": 40,
+      "degraded": 40,
+      "stalled": 40
+    },
+    "mode": "forecast",
+    "predictor": "ForecastModePredictor",
+    "features": [
+      "delivery_rate",
+      "p95_latency_ms",
+      "mean_gap_ms",
+      "calls_since_last_good",
+      "n_prior_probes",
+      "stall_rate",
+      "recent_delivery_rate"
+    ],
+    "target": "next_delivered",
+    "call_value_usdc": 0.02,
+    "min_price_usdc": 0.001,
+    "network": "base-sepolia",
+    "asset": "USDC"
+  },
+  "errors": []
+}

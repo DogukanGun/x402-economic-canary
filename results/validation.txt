@@ -1,0 +1,22 @@
+Validation criteria (paper Table 2 + significance + MCP smoke)
+
+criterion                    published (frozen)  paper-spec / oracle   paper-spec / forecast  
+----------------------------------------------------------------------------------------------
+precision>=0.90                     PASS                 PASS                   PASS          
+recall>=0.85                        PASS                 PASS                   FAIL          
+pr_auc>=0.80                        PASS                 PASS                   PASS          
+brier<=0.10                         PASS                 PASS                   FAIL          
+reliability<0.02                    PASS                 PASS                   PASS          
+cusum_latency<=3                    PASS                 PASS                   PASS          
+arl>=500                            PASS                 PASS                   PASS          
+usdc_saved_all_positive             PASS                 PASS                   PASS          
+dr_ci_excludes_zero                 PASS                 PASS                   PASS          
+mcnemar_liveness_p<0.05             PASS                 PASS                   PASS          
+mcnemar_ratings_p<0.05              PASS                 PASS                   PASS          
+delong_liveness_p<0.05              PASS                 PASS                   PASS          
+delong_ratings_p<0.05               PASS                 PASS                   PASS          
+mcp_smoke_all_four_labels           PASS                 PASS                   PASS          
+----------------------------------------------------------------------------------------------
+TOTAL                              14/14                14/14                  12/14          
+
+paper-spec / forecast misses: recall>=0.85, brier<=0.10

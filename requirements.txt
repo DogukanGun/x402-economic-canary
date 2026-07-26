@@ -1,0 +1,22 @@
+# Pinned to the exact stack that produced the published numbers
+# (see REPRODUCIBILITY.md). Do not float these three: the frozen reproduction
+# path in src/casper_pay_guard/repro/ is verified against them.
+numpy==2.4.4
+scipy==1.17.1
+scikit-learn==1.8.0
+
+# x402 handshake + signing
+httpx>=0.28
+eth-account>=0.13.7
+
+# MCP priced tool surface
+mcp>=1.27
+pydantic>=2.11
+
+# Observability + figures
+prometheus-client>=0.20
+matplotlib>=3.9
+
+# Tests
+pytest>=8
+pytest-asyncio>=1.0

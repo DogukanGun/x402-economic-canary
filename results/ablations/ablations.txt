@@ -1,0 +1,29 @@
+Table 1 — component ablation (forecast mode, seed 42)
+
+Configuration                   Stalled P  Stalled R     PR-AUC
+---------------------------------------------------------------
+full canary                         0.944      0.723      0.898
+- delivery rate                     0.938      0.727      0.899
+- p95 latency                       0.942      0.728      0.899
+- settlement-to-response gap        0.931      0.734      0.899
+- CUSUM (threshold only)            0.932      0.723      0.898
+
+PR-AUC unchanged when only CUSUM is removed: True
+
+Table 3 — DR USDC saved per routed call (forecast mode, seed 42)
+
+  policy: soft (pay w.p. p-hat)
+
+   Stall rate        $0.001        $0.010        $0.100
+  -----------------------------------------------------
+         0.10    -3.205e-03    -4.630e-04     2.696e-02
+         0.20    -1.922e-03     1.016e-03     3.040e-02
+         0.40    -1.558e-03     2.749e-03     4.583e-02
+
+  policy: ev (pay iff p*v > c)
+
+   Stall rate        $0.001        $0.010        $0.100
+  -----------------------------------------------------
+         0.10     1.703e-06     8.476e-04     8.549e-02
+         0.20     2.472e-05     1.832e-03     8.703e-02
+         0.40     1.112e-05     3.667e-03     9.017e-02

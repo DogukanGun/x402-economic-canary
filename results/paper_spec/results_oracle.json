@@ -1,0 +1,207 @@
+{
+  "status": "ok",
+  "spec": "paper Section 5",
+  "approach": "economic-canary (oracle mode)",
+  "baselines": [
+    "always-pay",
+    "402-as-healthy-liveness",
+    "marketplace-ratings"
+  ],
+  "metrics": {
+    "economic-canary": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f2": 1.0,
+      "pr_auc": 0.9981303042830368,
+      "brier": 5.203106599293193e-06,
+      "reliability": 1.5724028000032202e-06,
+      "resolution": 0.24695970293209876,
+      "uncertainty": 0.24695970293209876
+    },
+    "always-pay": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f2": 0.0,
+      "pr_auc": 0.435
+    },
+    "402-as-healthy-liveness": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f2": 0.0,
+      "pr_auc": 0.435
+    },
+    "marketplace-ratings": {
+      "precision": 0.48048780487804876,
+      "recall": 0.3773946360153257,
+      "f2": 0.39431545236188953,
+      "pr_auc": 0.4900226587103871
+    },
+    "brier_decomposition": {
+      "brier": 5.203106599293193e-06,
+      "reliability": 1.5724028000032202e-06,
+      "resolution": 0.24695970293209876,
+      "uncertainty": 0.24695970293209876,
+      "recomposed": 1.5724027999930446e-06
+    },
+    "confidence_intervals": {
+      "stalled_precision": {
+        "point": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0,
+        "n_boot": 2000
+      },
+      "stalled_recall": {
+        "point": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0,
+        "n_boot": 2000
+      },
+      "pr_auc": {
+        "point": 0.9981303042830368,
+        "ci_low": 0.9974467894067615,
+        "ci_high": 0.998655269377898,
+        "n_boot": 2000
+      },
+      "brier": {
+        "point": 5.203106599293193e-06,
+        "ci_low": 2.436370131614914e-06,
+        "ci_high": 9.091609367964569e-06,
+        "n_boot": 2000
+      }
+    },
+    "cusum": {
+      "median_latency_calls": 2.0,
+      "mean_latency_calls": 2.625,
+      "p95_latency_calls": 5.0,
+      "detection_rate": 1.0,
+      "arl_to_false_alarm": 1465.1125,
+      "params": {
+        "mu0": 0.98,
+        "k": 0.25,
+        "threshold": 1.8
+      }
+    },
+    "usdc_saved_by_policy": {
+      "soft": {
+        "ips": 0.0005563214651917534,
+        "snips": 0.0005567671812757111,
+        "dr": 0.0005223522847852581,
+        "dr_ci_low": 0.000513554656433831,
+        "dr_ci_high": 0.0005313487353309947,
+        "dr_ci_excludes_zero": true,
+        "all_positive": true,
+        "pay_rate": 0.5514796626494861
+      },
+      "ev": {
+        "ips": 0.0005595330318116307,
+        "snips": 0.000557920062688488,
+        "dr": 0.00052551835914731,
+        "dr_ci_low": 0.0005168478101805407,
+        "dr_ci_high": 0.0005344018944279904,
+        "dr_ci_excludes_zero": true,
+        "all_positive": true,
+        "pay_rate": 0.5516111111111112
+      }
+    },
+    "usdc_saved_per_call": {
+      "policy": "ev",
+      "ips": 0.0005595330318116307,
+      "snips": 0.000557920062688488,
+      "dr": 0.00052551835914731,
+      "dr_ci_low": 0.0005168478101805407,
+      "dr_ci_high": 0.0005344018944279904,
+      "dr_ci_excludes_zero": true,
+      "all_positive": true,
+      "pay_rate": 0.5516111111111112
+    },
+    "significance": {
+      "mcnemar": {
+        "always-pay": {
+          "p_value": 0.0,
+          "b": 3132,
+          "c": 0
+        },
+        "402-as-healthy-liveness": {
+          "p_value": 0.0,
+          "b": 3203,
+          "c": 0
+        },
+        "marketplace-ratings": {
+          "p_value": 0.0,
+          "b": 3228,
+          "c": 0
+        }
+      },
+      "delong": {
+        "402-as-healthy-liveness": {
+          "auc_canary": 0.9985961828983904,
+          "auc_baseline": 0.4912733529990167,
+          "p_value": 0.0
+        },
+        "marketplace-ratings": {
+          "auc_canary": 0.9985961828983904,
+          "auc_baseline": 0.6301909681016588,
+          "p_value": 0.0
+        }
+      }
+    },
+    "mcp_smoke": {
+      "passed": true,
+      "labels": {
+        "delivered": "delivered",
+        "degraded": "degraded",
+        "stalled": "stalled",
+        "unreachable": "unreachable"
+      }
+    },
+    "validation_criteria": {
+      "precision>=0.90": true,
+      "recall>=0.85": true,
+      "pr_auc>=0.80": true,
+      "brier<=0.10": true,
+      "reliability<0.02": true,
+      "cusum_latency<=3": true,
+      "arl>=500": true,
+      "usdc_saved_all_positive": true,
+      "dr_ci_excludes_zero": true,
+      "mcnemar_liveness_p<0.05": true,
+      "mcnemar_ratings_p<0.05": true,
+      "delong_liveness_p<0.05": true,
+      "delong_ratings_p<0.05": true,
+      "mcp_smoke_all_four_labels": true
+    },
+    "validation_passed": 14,
+    "validation_total": 14
+  },
+  "config": {
+    "n_endpoints": 120,
+    "trials_per_endpoint": 150,
+    "n_probes": 18000,
+    "train_probes": 10800,
+    "test_probes": 7200,
+    "seed": 42,
+    "train_fraction": 0.6,
+    "profiles": {
+      "honest": 40,
+      "degraded": 40,
+      "stalled": 40
+    },
+    "mode": "oracle",
+    "predictor": "OracleModePredictor",
+    "features": [
+      "settled",
+      "artifact_valid",
+      "schema_valid",
+      "http_200",
+      "http_5xx",
+      "log_latency",
+      "log_gap"
+    ],
+    "target": "delivered",
+    "call_value_usdc": 0.02,
+    "min_price_usdc": 0.001,
+    "network": "base-sepolia",
+    "asset": "USDC"
+  },
+  "errors": []
+}

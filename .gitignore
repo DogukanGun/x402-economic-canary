@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Local tooling state
+.claude/
+.DS_Store
+
+# Runtime ledgers. The committed results/ tree is the evidence for the
+# reported numbers and is regenerable with `make all`.
+*.sqlite
+*.db
+
+# Secrets — the canary's payer key must never be committed
+.env
+*.key
