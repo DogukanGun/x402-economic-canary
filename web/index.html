@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Casper Pay Guard — an economic canary for pay-then-deliver x402 markets</title>
+<title>Casper Pay Guard: an economic canary for pay-then-deliver x402 markets</title>
 <meta name="description" content="It pays x402 endpoints like a customer, verifies the artifact, and tells you whether your next routed call will get anything for its money.">
 <style>
   :root {
@@ -450,7 +450,7 @@
     <div class="kicker">Interactive demo</div>
     <h2>The market at a glance</h2>
     <p class="section-lede">
-      Eight x402 provider endpoints. The <b>Monitor</b> column is what a liveness dashboard sees —
+      Eight x402 provider endpoints. The <b>Monitor</b> column is what a liveness dashboard sees:
       every endpoint answers the unauthenticated check with a well-formed <code>402</code>, so every
       endpoint is “healthy”. The <b>Canary</b> column is what you learn by actually paying.
     </p>
@@ -484,7 +484,7 @@
           <tbody id="probe-log-body"></tbody>
         </table>
       </div>
-      <div class="log-empty" id="log-empty">// no probes yet — run a sweep. every row below is a payment that settled.</div>
+      <div class="log-empty" id="log-empty">// no probes yet, run a sweep. every row below is a payment that settled.</div>
     </div>
   </div>
 </section>
@@ -495,8 +495,8 @@
     <div class="kicker">The numbers</div>
     <h2>Reproduced bit-for-bit, not to a tolerance</h2>
     <p class="section-lede">
-      <code>make reproduce</code> regenerates every published value exactly — all 22 asserted by
-      <code>tests/test_reproduce.py</code> — from a 7,200-probe simulated x402 corpus.
+      <code>make reproduce</code> regenerates every published value exactly, all 22 asserted by
+      <code>tests/test_reproduce.py</code>, from a 7,200-probe simulated x402 corpus.
     </p>
 
     <div class="stat-grid">
@@ -539,9 +539,9 @@
 
     <div class="fine-print">
       <strong>Honesty box.</strong> The headline numbers grade the paper’s published oracle-mode configuration.
-      The deployable framing — <em>forecast</em> mode, predicting your <em>next</em> call from endpoint history only —
+      The deployable framing (<em>forecast</em> mode, predicting your <em>next</em> call from endpoint history only)
       scores stalled precision <b>0.944</b> / recall <b>0.723</b> (PR-AUC 0.898, Brier 0.110), missing two of the
-      paper’s own targets; reported as computed, nothing tuned to close them. All numbers are simulation-derived —
+      paper’s own targets; reported as computed, nothing tuned to close them. All numbers are simulation-derived;
       no mainnet or testnet funds moved to produce them. Paper:
       <a href="https://zenodo.org/record/21515696" target="_blank" rel="noopener">Zenodo&nbsp;10.5281/zenodo.21515696</a>.
     </div>
@@ -556,7 +556,7 @@
         <div class="kicker">Settlement</div>
         <h2>On-chain settlement on Casper Testnet</h2>
         <p>
-          The canary’s point is that settlement is the part that <em>always</em> works — the thief’s half of
+          The canary’s point is that settlement is the part that <em>always</em> works: the thief’s half of
           the trade confirms beautifully. Here is a canary payment settled for real on Casper Testnet:
           the money moved, the deploy is public, and the verdict on what came back is the canary’s, not the chain’s.
         </p>
@@ -591,7 +591,7 @@
     <h2>Pay like a customer, check like a skeptic</h2>
     <p class="section-lede">
       Every probe is a real x402 purchase graded into a four-way taxonomy. <code>stalled</code> is the class
-      incumbents structurally cannot represent — reaching it requires having <em>paid</em> and knowing what
+      incumbents structurally cannot represent, because reaching it requires having <em>paid</em> and knowing what
       a good body looks like.
     </p>
 
@@ -630,9 +630,9 @@
       <div class="pl-step"><div class="n">07</div><div class="t">MCP tool</div><div class="d">a priced tool any agent can call before routing</div></div>
     </div>
     <p class="pipeline-note">
-      <strong>The measurement that matters is the settlement-to-response gap — and when it starts.</strong>
+      <strong>The measurement that matters is the settlement-to-response gap, and when it starts.</strong>
       Settlement consumes the authorization; it does not wait on the origin. Start the clock at the origin’s
-      headers and a provider that takes your money then withholds its status line reports a near-zero gap —
+      headers and a provider that takes your money then withholds its status line reports a near-zero gap, so
       the endpoint robbing you grades as the fastest. The canary starts the clock at settlement, which is
       exactly why <code>stalled_silent</code> grades correctly.
     </p>
@@ -648,7 +648,7 @@
       </div>
       <div class="mcp-tool">
         <div class="tn">canary_metrics</div>
-        <p>Prometheus exposition of delivery rate, p95 latency, settlement gap, and spend — the canary as infrastructure.</p>
+        <p>Prometheus exposition of delivery rate, p95 latency, settlement gap, and spend. The canary as infrastructure.</p>
       </div>
     </div>
   </div>
@@ -664,7 +664,7 @@
     <p class="foot-note">
       Built honestly: the EIP-712 signing is real and recovers to the payer address; the results are
       published, reproducible research (<a href="https://zenodo.org/record/21515696" target="_blank" rel="noopener">Zenodo 10.5281/zenodo.21515696</a>);
-      and no mainnet funds are touched — <code>SettlementReceipt.on_chain</code> is <code>False</code> for
+      and no mainnet funds are touched; <code>SettlementReceipt.on_chain</code> is <code>False</code> for
       everything the repo alone can produce.
     </p>
   </div>
@@ -681,9 +681,9 @@
   var PROVIDERS = [
     { name: "asp-vision-api",   path: "/asp/vision/caption",  verdict: "delivered", http: "200", latency: 182.4,  gap: 34.1,   tx: "0x8f2c1ab34de90f12a6" },
     { name: "asp-translate",    path: "/asp/translate/v1",    verdict: "delivered", http: "200", latency: 96.3,   gap: 21.7,   tx: "0x3be97d02c41aa8e05f" },
-    { name: "asp-quant-feed",   path: "/asp/quant/ticks",     verdict: "stalled",   http: "—",   latency: 1015.2, gap: 1001.6, tx: "0xd41f7a90b3c25e88c1", villain: true, note: "silent timeout — body never arrived" },
+    { name: "asp-quant-feed",   path: "/asp/quant/ticks",     verdict: "stalled",   http: "none",   latency: 1015.2, gap: 1001.6, tx: "0xd41f7a90b3c25e88c1", villain: true, note: "silent timeout, body never arrived" },
     { name: "asp-embeddings",   path: "/asp/embed/batch",     verdict: "delivered", http: "200", latency: 143.8,  gap: 28.9,   tx: "0x71a3e5f8d20b94c6d3" },
-    { name: "asp-ocr-batch",    path: "/asp/ocr/pdf",         verdict: "degraded",  http: "200", latency: 88.1,   gap: 19.4,   tx: "0xa95c04d1e7f36b20b8", note: "empty body — schema check failed" },
+    { name: "asp-ocr-batch",    path: "/asp/ocr/pdf",         verdict: "degraded",  http: "200", latency: 88.1,   gap: 19.4,   tx: "0xa95c04d1e7f36b20b8", note: "empty body, schema check failed" },
     { name: "asp-geocode",      path: "/asp/geo/forward",     verdict: "delivered", http: "200", latency: 74.6,   gap: 18.2,   tx: "0x5e08b6a2f9d17c43ea" },
     { name: "asp-alpha-signals",path: "/asp/signals/daily",   verdict: "stalled",   http: "502", latency: 231.5,  gap: 212.0,  tx: "0xc27d93e0a41f58b671", note: "fast 5xx after settlement" },
     { name: "asp-tts-stream",   path: "/asp/tts/stream",      verdict: "delivered", http: "200", latency: 167.9,  gap: 41.3,   tx: "0x9640fb1c85d2ae37f4" }
@@ -723,7 +723,7 @@
           "</div>" +
           '<div class="verdict-box">' +
             '<div class="src">Canary</div>' +
-            '<span class="chip chip-idle" id="canary-chip-' + i + '"><span class="cdot"></span>—</span>' +
+            '<span class="chip chip-idle" id="canary-chip-' + i + '"><span class="cdot"></span>&hellip;</span>' +
             '<div class="verdict-meta" id="canary-meta-' + i + '">not probed</div>' +
           "</div>" +
         "</div>";
@@ -761,8 +761,8 @@
     setChip(i, "chip-probing", "probing…", true);
     meta.textContent = "paid 0.001 · awaiting body";
 
-    // stalled probes visibly take longer — the timeout is the story
-    var wait = p.verdict === "stalled" && p.http === "—" ? 1500 : 620;
+    // stalled probes visibly take longer; the timeout is the story
+    var wait = p.verdict === "stalled" && p.http === "none" ? 1500 : 620;
 
     setTimeout(function () {
       card.classList.remove("probing");
