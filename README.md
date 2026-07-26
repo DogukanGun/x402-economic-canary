@@ -11,6 +11,17 @@ whether your next routed call will get anything for its money.
 > [`687c0f2e...`](https://testnet.cspr.live/deploy/687c0f2ecfb9fc9e191779449b4945f8ac46533e5e832b0167533a574daba2ab)
 > (see [Casper Testnet settlement](#casper-testnet-settlement)).
 
+**This project is built on a published research paper**: *Economic Canaries for
+Pay-Then-Deliver Agent Markets: Detecting Settled-but-Stalled x402 Service
+Providers Before You Route*
+([Zenodo DOI 10.5281/zenodo.21515696](https://zenodo.org/record/21515696)).
+This repository is the paper's full implementation: every published number
+regenerates **bit for bit** from `make reproduce`, the evaluation is asserted
+by 106 tests, and the detector it validates is what this canary runs in
+production. The paper's precision/recall, calibration, detection-latency and
+economic-savings results are documented in
+[REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+
 x402 is trustless at the payment layer and trust-maximal at the delivery layer.
 There is no escrow, no conditional release, and nothing in the protocol that
 guarantees a confirmed settlement produces usable output. A provider can accept
